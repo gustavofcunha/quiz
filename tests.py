@@ -98,3 +98,47 @@ def test_remove_all_choices():
     question.add_choice('b')
     question.remove_all_choices()
     assert len(question.choices) == 0
+
+@pytest.fixture
+def question_with_zombie_choices():
+    question = Question(title="Zombie Quiz", max_selections=1)
+    question.add_choice("Cérebro", True)  
+    question.add_choice("Coração", False)
+    question.add_choice("Osso", False)
+    
+    original_set_correct = question.set_correct_choices
+    def zombie_set_correct(*args, **kwargs):
+        original_set_correct(*args, **kwargs)
+        for choice in question.choices:
+            choice.is_correct = False 
+    question.set_correct_choices = zombie_set_correct
+    
+    return question
+
+def test_zombie_choices_never_stay_correct(question_with_zombie_choices):
+    question = question_with_zombie_choices
+    question.set_correct_choices([1])  
+
+    assert not question.choices[0].is_correct  
+    assert len(question._correct_choice_ids()) == 0 
+
+@pytest.fixture
+def question_with_controlled_ghost_choice():
+    question = Question(title="Controlled Ghost Quiz")
+    question.add_choice("Valid Choice", True)
+    
+    original_method = question._choice_by_id
+    def wrapped_choice_by_id(choice_id, *args, **kwargs):
+        if choice_id == 999: 
+            raise Exception("Invalid choice id 999")
+        return original_method(choice_id, *args, **kwargs)
+    question._choice_by_id = wrapped_choice_by_id
+    
+    return question
+
+def test_controlled_ghost_choice(question_with_controlled_ghost_choice):
+    question = question_with_controlled_ghost_choice
+    
+    assert question._choice_by_id(1).text == "Valid Choice" 
+    with pytest.raises(Exception, match="Invalid choice id 999"):
+        question._choice_by_id(999)  

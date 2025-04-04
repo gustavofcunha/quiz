@@ -10,7 +10,7 @@ Você deve realizar os 3 commits descritos abaixo e submeter os 3 links dos comm
 Primeiramente, explore o código do sistema em [model.py](https://github.com/andrehora/quiz/blob/main/model.py).
 Note que temos duas classes: `Question` (que representa as questões do quiz) e `Choice` (escolha das questões).
 
-Explore também os cinco testes em [tests.py](https://github.com/andrehora/quiz/blob/main/tests.py) para entender melhor como o sistema funciona:
+Explore, também, os cinco testes em [tests.py](https://github.com/andrehora/quiz/blob/main/tests.py) para entender melhor como o sistema funciona:
 Por exemplo:
 
 ```python
